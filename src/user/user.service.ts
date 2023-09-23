@@ -44,4 +44,8 @@ export class UserService {
 
     return this._getUserDetails(user);
   }
+
+  async getAllUsers(): Promise<UserDocument[]> {
+    return this.userModel.find().exec();
+  }
 }
