@@ -4,7 +4,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param,
   Post,
   Redirect,
 } from '@nestjs/common';
@@ -27,10 +26,10 @@ export class CatsController {
     return 'Redirect to wiki';
   }
 
-  @Get(':id')
-  getCat(@Param('id') id: number) {
-    return this.catsService.getOne(id);
-  }
+  // @Get(':id')
+  // getCat(@Param('id') id: number) {
+  //   return this.catsService.getOne(id);
+  // }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

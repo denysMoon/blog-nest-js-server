@@ -1,39 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { AddCatDto } from './dto/add-cat';
-import { v4 as uuidv4 } from 'uuid';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { CatsDocument } from 'src/schemas/cat.schema';
 
 @Injectable()
 export class CatsService {
-  private cats = [
-    {
-      name: 'Car',
-      color: 'black',
-      id: uuidv4(),
-    },
-    {
-      name: 'Dander',
-      color: 'black and white',
-      id: uuidv4(),
-    },
-    {
-      name: 'Mur',
-      color: 'white',
-      id: uuidv4(),
-    },
-  ];
+  constructor(@InjectModel('Cats') private catsModel: Model<CatsDocument>) {}
 
-  getAll() {
-    return this.cats;
+  async getAll(): Promise<CatsDocument[]> {
+    return this.catsModel.find().exec();
   }
 
-  getOne(id: number) {
-    return this.cats.find((cat) => cat.id === id);
-  }
-
-  addCat(addCatDto: AddCatDto) {
-    this.cats.push({
-      ...addCatDto,
-      id: uuidv4(),
-    });
+  async addCat(addCatDto: AddCatDto): Promise<CatsDocument> {
+    const newCat = new this.catsModel(addCatDto);
+    return newCat.save();
   }
 }
