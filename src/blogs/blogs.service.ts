@@ -1,19 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
-import { CreateBlogDto } from './dto/create-blog';
+import { Post, Prisma } from '@prisma/client';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class BlogService {
-  constructor(private userService: UserService) {}
+  constructor(private prisma: PrismaService) {}
 
-  async getBlog() {
-    // return this.blogModel.find().exec();
+  async getFeed() {
+    return this.prisma.post.findMany({});
   }
 
-  async createBlog(createBlogDto: CreateBlogDto) {
-    const { email, title } = createBlogDto;
-    console.log(email, title);
+  async createPost(data: Prisma.PostCreateInput): Promise<Post> {
+    return this.prisma.post.create({
+      data,
+    });
+  }
 
-    return 'createdBlog';
+  async getPostsByEmail(getPostsByEmailDto): Promise<Post[]> {
+    const { email } = getPostsByEmailDto;
+
+    return this.prisma.post.findMany({
+      where: {
+        author: {
+          email,
+        },
+      },
+    });
   }
 }
