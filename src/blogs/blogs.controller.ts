@@ -22,7 +22,6 @@ export class BlogController {
   @Post('create-post')
   @HttpCode(HttpStatus.CREATED)
   createBlog(@Body() createBlogDto: CreateBlogDto) {
-    console.log(createBlogDto);
     return this.blogService.createPost(createBlogDto);
   }
 
