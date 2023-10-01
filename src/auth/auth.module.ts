@@ -5,9 +5,10 @@ import { AuthController } from './auth.controller';
 import { UserModule } from 'src/user/user.module';
 import { JwtGuard } from './guard/jws.guard';
 import { JwtStrategy } from './guard/jwt.strategy';
+import { PrismaService } from 'src/prisma.service';
 
 @Module({
-  providers: [AuthService, JwtGuard, JwtStrategy],
+  providers: [AuthService, JwtGuard, JwtStrategy, PrismaService],
   controllers: [AuthController],
   imports: [
     UserModule,

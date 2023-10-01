@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { ExistingUserDto } from 'src/user/dto/existing-user';
 import { RegisterUserDto } from 'src/user/dto/new-user';
-import { UserDetails } from 'src/user/user-details.interface';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -17,22 +16,18 @@ export class AuthService {
     return bcrypt.hash(password, 10);
   }
 
-  async register(
-    user: Readonly<RegisterUserDto>,
-  ): Promise<UserDetails | null | string> {
+  async register(user: Readonly<RegisterUserDto>) {
     const { name, email, password } = user;
-
-    const existingUser = await this.userService.findOneByEmail(email);
-
-    if (existingUser) {
-      return 'User with this email already exists';
-    }
 
     const hashPassword = await this.hashPassword(password);
 
-    const newUser = await this.userService.create(name, email, hashPassword);
+    const newUser = await this.userService.create({
+      name,
+      email,
+      password: hashPassword,
+    });
 
-    return this.userService._getUserDetails(newUser);
+    return newUser;
   }
 
   async isPassportMath(
@@ -42,10 +37,7 @@ export class AuthService {
     return bcrypt.compare(password, hashPassword);
   }
 
-  async validateUser(
-    email: string,
-    password: string,
-  ): Promise<UserDetails | string> {
+  async validateUser(email: string, password: string) {
     const user = await this.userService.findOneByEmail(email);
 
     if (!user) {
@@ -58,12 +50,10 @@ export class AuthService {
       return 'Password is incorrect';
     }
 
-    return this.userService._getUserDetails(user);
+    return user;
   }
 
-  async login(
-    existingUser: ExistingUserDto,
-  ): Promise<{ token: string } | null> {
+  async login(existingUser: ExistingUserDto) {
     const { email, password } = existingUser;
 
     const user = await this.validateUser(email, password);
@@ -72,7 +62,7 @@ export class AuthService {
       user === 'This user does not exist' ||
       user === 'Password is incorrect'
     ) {
-      return null;
+      return 'Something went wrong';
     }
 
     const jwt = await this.jwtService.signAsync({ user });
