@@ -7,9 +7,9 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { BlogService } from './blog.service';
+import { BlogService } from './blogs.service';
 import { JwtGuard } from 'src/auth/guard/jws.guard';
-import { CreateBlogDto } from './dto/add-post';
+import { CreateBlogDto } from './dto/create-blog';
 
 @Controller('blog')
 export class BlogController {
