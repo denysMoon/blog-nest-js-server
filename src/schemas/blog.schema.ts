@@ -9,7 +9,15 @@ export class Blog {
   title: string;
 
   @Prop({ required: true })
-  post: string;
+  email: string;
+
+  @Prop([
+    {
+      title: String,
+      post: String,
+    },
+  ])
+  posts: { title: string; post: string }[];
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);
