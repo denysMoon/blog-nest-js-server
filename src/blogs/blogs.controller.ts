@@ -5,25 +5,29 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import { BlogService } from './blogs.service';
-import { JwtGuard } from 'src/auth/guard/jws.guard';
 import { CreateBlogDto } from './dto/create-blog';
+import { GetPostsByEmailDto } from './dto/get-posts-by-email';
 
 @Controller('blog')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  createBlog(@Body() createBlogDto: CreateBlogDto) {
-    return this.blogService.createBlog(createBlogDto);
+  @Get()
+  getFeed() {
+    return this.blogService.getFeed();
   }
 
-  @UseGuards(JwtGuard)
-  @Get()
-  getBlog() {
-    return this.blogService.getBlog();
+  @Post('create-post')
+  @HttpCode(HttpStatus.CREATED)
+  createBlog(@Body() createBlogDto: CreateBlogDto) {
+    return this.blogService.createPost(createBlogDto);
+  }
+
+  @Post('get-posts-by-email')
+  @HttpCode(HttpStatus.CREATED)
+  getPostsByEmail(@Body() getPostsByEmailDto: GetPostsByEmailDto) {
+    return this.blogService.getPostsByEmail(getPostsByEmailDto);
   }
 }
