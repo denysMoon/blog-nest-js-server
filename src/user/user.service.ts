@@ -1,51 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { UserDocument } from 'src/schemas/user.schema';
-import { UserDetails } from './user-details.interface';
+import { PrismaService } from 'src/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel('User') private readonly userModel: Model<UserDocument>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  _getUserDetails(user: UserDocument): UserDetails {
-    return {
-      id: user._id,
-      email: user.email,
-      name: user.name,
-    };
-  }
+  async create({ email, name, password }: Prisma.UserCreateInput) {
+    const isUserExist = await this.findOneByEmail(email);
 
-  async create(
-    name: string,
-    email: string,
-    hashPassword: string,
-  ): Promise<UserDocument> {
-    const newUser = new this.userModel({
-      name,
-      email,
-      password: hashPassword,
-    });
-    return newUser.save();
-  }
-
-  async findOneByEmail(email: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ email }).exec();
-  }
-
-  async findOneById(id: string): Promise<UserDetails | null> {
-    const user = await this.userModel.findById({ id }).exec();
-
-    if (!user) {
-      return null;
+    if (isUserExist) {
+      return 'User exist';
     }
 
-    return this._getUserDetails(user);
+    const newUser = await this.prisma.user.create({
+      data: {
+        email,
+        name,
+        password,
+      },
+    });
+
+    return newUser;
   }
 
-  async getAllUsers(): Promise<UserDocument[]> {
-    return this.userModel.find().exec();
+  async findOneByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+  }
+
+  async getAllUsers() {
+    return this.prisma.user.findMany();
   }
 }
