@@ -11,12 +11,20 @@ datasource db {
 }
 
 model User {
-  id               Int      @id @default(autoincrement())
-  email            String   @unique
+  id               Int           @id @default(autoincrement())
+  email            String        @unique
   name             String
   password         String
-  registrationDate DateTime @default(now())
+  registrationDate DateTime      @default(now())
   posts            Post[]
+  UserSetting      UserSetting[]
+}
+
+model UserSetting {
+  id            Int    @id @default(autoincrement())
+  themeMode     String @default("light")
+  user          User?  @relation(fields: [userSettingId], references: [id])
+  userSettingId Int?
 }
 
 model Post {
