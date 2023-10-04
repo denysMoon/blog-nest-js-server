@@ -6,10 +6,14 @@ import { UpdateThemeModeDto } from './dto/update-theme-mode';
 export class UserSettingsService {
   constructor(private prisma: PrismaService) {}
 
+  // Temporary solution to get only themeMode
   async getUserSettings(id: string) {
-    return this.prisma.userSetting.findMany({
+    return await this.prisma.userSetting.findUnique({
       where: {
         id: Number(id),
+      },
+      select: {
+        themeMode: true,
       },
     });
   }
@@ -38,11 +42,15 @@ export class UserSettingsService {
       await this.createSettingsTable(userId);
     }
 
+    // Temporary solution to update only themeMode
     const updatedUserSetting = await this.prisma.userSetting.update({
       where: { id: userId },
       data: { themeMode },
+      select: {
+        themeMode: true,
+      },
     });
 
-    return updatedUserSetting.themeMode;
+    return updatedUserSetting;
   }
 }
